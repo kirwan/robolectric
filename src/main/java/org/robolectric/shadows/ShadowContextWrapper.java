@@ -35,6 +35,7 @@ import java.util.Set;
 
 import static android.content.pm.PackageManager.PERMISSION_DENIED;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
+import static org.robolectric.Robolectric.directlyOn;
 import static org.robolectric.Robolectric.shadowOf;
 
 @SuppressWarnings({"UnusedDeclaration"})
@@ -340,6 +341,7 @@ public class ShadowContextWrapper extends ShadowContext {
     @Implementation
     public void attachBaseContext(Context context) {
         baseContext = context;
+        directlyOn(realContextWrapper, ContextWrapper.class, "attachBaseContext", Context.class).invoke(context);
     }
 
     public ShadowApplication getShadowApplication() {
@@ -354,6 +356,11 @@ public class ShadowContextWrapper extends ShadowContext {
     @Implementation
     public void unbindService(final ServiceConnection serviceConnection) {
         getShadowApplication().unbindService(serviceConnection);
+    }
+
+    @Implementation
+    public boolean isRestricted() {
+        return false;
     }
 
     /**
