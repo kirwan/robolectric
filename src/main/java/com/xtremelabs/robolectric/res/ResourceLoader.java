@@ -66,14 +66,14 @@ public class ResourceLoader {
 	private final BoolResourceLoader boolResourceLoader;
 	private boolean isInitialized = false;
 	private boolean strictI18n = false;
-	
+
 	private final Set<Integer> ninePatchDrawableIds = new HashSet<Integer>();
 
 	public ResourceLoader( int sdkVersion, Class rClass, File resourceDir, File assetsDir) throws Exception {
 		this.sdkVersion = sdkVersion;
 		this.assetsDir = assetsDir;
 		this.rClass = rClass;
-		
+
 		resourceExtractor = new ResourceExtractor();
 		resourceExtractor.addLocalRClass( rClass );
 		resourceExtractor.addSystemRClass( R.class );
@@ -116,7 +116,7 @@ public class ResourceLoader {
 		if ( isInitialized ) {
 			return;
 		}
-		
+
 		try {
 			if ( resourceDir != null ) {
 				viewLoader = new ViewLoader( resourceExtractor, attrResourceLoader );
@@ -139,12 +139,13 @@ public class ResourceLoader {
 				loadValueResources( localValueResourceDir, systemValueResourceDir );
 				loadDimenResources( localValueResourceDir, systemValueResourceDir );
 				loadIntegerResource( localValueResourceDir, systemValueResourceDir );
+				loadBooleanResources(localValueResourceDir, systemValueResourceDir);
 				loadViewResources( systemResourceDir, resourceDir );
 				loadMenuResources( resourceDir );
 				loadDrawableResources( resourceDir );
 				loadPreferenceResources( preferenceDir );
 				loadXmlFileResources( preferenceDir );
-				
+
 				listNinePatchResources(ninePatchDrawableIds, resourceDir);
 			} else {
 				viewLoader = null;
@@ -166,25 +167,26 @@ public class ResourceLoader {
 	 * @param locale
 	 */
 	public void reloadValuesResouces( String qualifiers ) {
-		
+
 		File systemResourceDir = getSystemResourceDir( getPathToAndroidResources() );
 		File localValueResourceDir = getValueResourceDir( resourceDir, qualifiers, true );
 		File systemValueResourceDir = getValueResourceDir( systemResourceDir, null, false );
 		File preferenceDir = getPreferenceResourceDir( resourceDir );
-		
+
 		try {
 			loadStringResources( localValueResourceDir, systemValueResourceDir );
 			loadPluralsResources( localValueResourceDir, systemValueResourceDir );
 			loadValueResources( localValueResourceDir, systemValueResourceDir );
 			loadDimenResources( localValueResourceDir, systemValueResourceDir );
 			loadIntegerResource( localValueResourceDir, systemValueResourceDir );
+			loadBooleanResources(localValueResourceDir, systemValueResourceDir);
 			loadMenuResources( resourceDir );
 			loadPreferenceResources( preferenceDir );
 		} catch ( Exception e ) {
 			throw new RuntimeException( e );
-		} 
+		}
 	}
-	
+
 	private File getSystemResourceDir( String pathToAndroidResources ) {
 		return pathToAndroidResources != null ? new File( pathToAndroidResources ) : null;
 	}
@@ -192,6 +194,11 @@ public class ResourceLoader {
 	private void loadStringResources( File localResourceDir, File systemValueResourceDir ) throws Exception {
 		DocumentLoader stringResourceDocumentLoader = new DocumentLoader( this.stringResourceLoader );
 		loadValueResourcesFromDirs( stringResourceDocumentLoader, localResourceDir, systemValueResourceDir );
+	}
+
+	private void loadBooleanResources(File localResourceDir, File systemValueResourceDir) throws Exception {
+		DocumentLoader boolResourceDocumentLoader = new DocumentLoader(this.boolResourceLoader);
+		loadValueResourcesFromDirs(boolResourceDocumentLoader, localResourceDir, systemValueResourceDir);
 	}
 
 	private void loadPluralsResources( File localResourceDir, File systemValueResourceDir ) throws Exception {
@@ -237,13 +244,13 @@ public class ResourceLoader {
 			preferenceDocumentLoader.loadResourceXmlDir( xmlResourceDir );
 		}
 	}
-	
+
 	/**
-	 * All the Xml files should be loaded. 
+	 * All the Xml files should be loaded.
 	 */
 	private void loadXmlFileResources( File xmlResourceDir ) throws Exception {
 		if ( xmlResourceDir.exists() ) {
-			DocumentLoader xmlFileDocumentLoader = 
+			DocumentLoader xmlFileDocumentLoader =
 					new DocumentLoader( xmlFileLoader );
 			xmlFileDocumentLoader.loadResourceXmlDir( xmlResourceDir );
 		}
@@ -301,7 +308,7 @@ public class ResourceLoader {
 	private File getPreferenceResourceDir( File xmlResourceDir ) {
 		return xmlResourceDir != null ? new File( xmlResourceDir, "xml" ) : null;
 	}
-	
+
 	private String getPathToAndroidResources() {
 		String resourcePath;
 		if ( ( resourcePath = getAndroidResourcePathFromLocalProperties() ) != null ) {
@@ -456,12 +463,12 @@ public class ResourceLoader {
 		init();
 		return integerResourceLoader.getValue( id );
 	}
-	
+
 	public boolean getBooleanValue( int id ) {
 		init();
 		return boolResourceLoader.getValue( id );
 	}
-	
+
 	public XmlResourceParser getXml( int id ) {
 		init();
 		return xmlFileLoader.getXml( id );
@@ -472,10 +479,10 @@ public class ResourceLoader {
 		return drawableResourceLoader.isXml( resourceId );
 	}
 
-    public boolean isAnimatableXml( int resourceId ) {
-        init();
-        return drawableResourceLoader.isAnimationDrawable( resourceId );
-    }
+	public boolean isAnimatableXml( int resourceId ) {
+		init();
+		return drawableResourceLoader.isAnimationDrawable( resourceId );
+	}
 
 	public int[] getDrawableIds( int resourceId ) {
 		init();
@@ -525,11 +532,11 @@ public class ResourceLoader {
 
 		return null;
 	}
-	
+
 	public boolean isNinePatchDrawable(int drawableResourceId) {
 		return ninePatchDrawableIds.contains(drawableResourceId);
 	}
-	
+
 	/**
 	 * Returns a collection of resource IDs for all nine-patch drawables
 	 * in the project.
