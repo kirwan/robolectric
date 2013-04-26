@@ -22,7 +22,7 @@
 
          -->
     <!-- this should match whatever is defined in Robolectic.DEFAULT_SDK_VERSION -->
-    <property name="default.sdk.version" value="16"/>
+    <property name="default.sdk.version" value="17"/>
 
     <property file="build.properties"/>
     <!-- The default.properties file is created and updated by the 'android' tool, as well
@@ -38,8 +38,8 @@
         <exec executable="./find-android.bat"/>
     </target>
     <target name="findAndroidUnix" unless="isWindows">
-        <echo message="Finding the Android version in *nix"/>
-        <exec executable="./find-android.sh"/>
+        <echo message="BLOCKED BY KIRWAN - Finding the Android version in *nix"/>
+        <!-- <exec executable="./find-android.sh"/> -->
     </target>
     <property file="local.properties"/>
 
